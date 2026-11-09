@@ -7,8 +7,8 @@
 -- PBKDF2 hash of 'admin123'
 INSERT INTO Users (username, email, password_hash, role)
 VALUES 
-('admin', 'admin@ecommerce.com', 'scrypt:32768:8:1$xP5D8qf2vR0i6mN7$b336ef10ec252ca913d94191be86dfc9aece0ee693526017bbdca81313493010471b403487c6532d56c0e3532c15ea49bf2f74e6f40b25e7144e056aa13759ad', 'admin'),
-('staff1', 'staff@ecommerce.com', 'scrypt:32768:8:1$xP5D8qf2vR0i6mN7$b336ef10ec252ca913d94191be86dfc9aece0ee693526017bbdca81313493010471b403487c6532d56c0e3532c15ea49bf2f74e6f40b25e7144e056aa13759ad', 'staff')
+('admin', 'admin@ecommerce.com', 'scrypt:32768:8:1$3chB5gCTFNstaLgi$888ddd725e37306fc629baaf797bf5e4289f3ebfde3a9ec00b7dab976acd1520b12575158030735d73df065e15b9dae8d43ebc664f0bf87c73123ead7395cd89', 'admin'),
+('staff1', 'staff@ecommerce.com', 'scrypt:32768:8:1$3chB5gCTFNstaLgi$888ddd725e37306fc629baaf797bf5e4289f3ebfde3a9ec00b7dab976acd1520b12575158030735d73df065e15b9dae8d43ebc664f0bf87c73123ead7395cd89', 'staff')
 ON CONFLICT (username) DO NOTHING;
 
 -- 2. Insert Categories
