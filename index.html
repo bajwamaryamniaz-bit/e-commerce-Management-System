@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - E-Commerce DBMS</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <!-- SIDEBAR NAVIGATION -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-brand-icon">
+        <i class="fa-solid fa-layer-group"></i>
+      </div>
+      <div>
+        <div class="sidebar-brand-title">E-Commerce</div>
+        <div class="sidebar-brand-sub">DBMS Portal</div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="index.html" class="nav-link active">
+        <i class="fa-solid fa-chart-pie"></i>
+        <span>Dashboard</span>
+      </a>
+      <a href="products.html" class="nav-link">
+        <i class="fa-solid fa-box-open"></i>
+        <span>Products</span>
+      </a>
+      <a href="inventory.html" class="nav-link">
+        <i class="fa-solid fa-warehouse"></i>
+        <span>Inventory</span>
+      </a>
+      <a href="customers.html" class="nav-link">
+        <i class="fa-solid fa-users"></i>
+        <span>Customers</span>
+      </a>
+      <a href="suppliers.html" class="nav-link">
+        <i class="fa-solid fa-truck-moving"></i>
+        <span>Suppliers</span>
+      </a>
+      <a href="purchases.html" class="nav-link">
+        <i class="fa-solid fa-cart-shopping"></i>
+        <span>Purchases</span>
+      </a>
+      <a href="sales.html" class="nav-link">
+        <i class="fa-solid fa-cash-register"></i>
+        <span>Sales & POS</span>
+      </a>
+      <a href="reports.html" class="nav-link">
+        <i class="fa-solid fa-file-invoice-dollar"></i>
+        <span>Reports</span>
+      </a>
+      <a href="ai-assistant.html" class="nav-link">
+        <i class="fa-solid fa-wand-magic-sparkles" style="color: var(--teal-primary);"></i>
+        <span>AI Assistant</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-profile">
+        <div class="user-avatar">A</div>
+        <div class="user-info">
+          <span class="user-name">Admin User</span>
+          <span class="user-role">Database Admin</span>
+        </div>
+      </div>
+      <a href="javascript:void(0)" onclick="logoutUser()" title="Logout" style="color: var(--text-muted); font-size: 1.1rem; cursor: pointer;">
+        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+      </a>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT AREA -->
+  <main class="main-content">
+    <header class="top-header">
+      <div class="page-title">
+        <h1>Dashboard Overview</h1>
+        <p>Real-time relational database metrics, sales performance & inventory status</p>
+      </div>
+      <div class="header-actions">
+        <a href="sales.html" class="btn btn-primary">
+          <i class="fa-solid fa-plus"></i> New Sale
+        </a>
+        <a href="purchases.html" class="btn btn-secondary">
+          <i class="fa-solid fa-dolly"></i> New Purchase
+        </a>
+      </div>
+    </header>
+
+    <!-- KPI STATS CARDS (BLUEPRINT SECTION 7) -->
+    <section class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-label">PRODUCTS</div>
+        <div class="kpi-value" id="kpi-products">--</div>
+        <div class="kpi-icon-box kpi-icon-products">
+          <i class="fa-solid fa-cubes"></i>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-label">TOTAL SALES</div>
+        <div class="kpi-value" id="kpi-sales">--</div>
+        <div class="kpi-icon-box kpi-icon-sales">
+          <i class="fa-solid fa-dollar-sign"></i>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-label">LOW STOCK</div>
+        <div class="kpi-value" id="kpi-low-stock">--</div>
+        <div class="kpi-icon-box kpi-icon-low-stock">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-label">CUSTOMERS</div>
+        <div class="kpi-value" id="kpi-customers">--</div>
+        <div class="kpi-icon-box kpi-icon-customers">
+          <i class="fa-solid fa-user-group"></i>
+        </div>
+      </div>
+    </section>
+
+    <!-- ILLUSTRATIVE SALES OVERVIEW CHART (BLUEPRINT FIG 7) -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <div class="chart-title">
+          <i class="fa-solid fa-chart-line" style="color: var(--teal-primary); margin-right: 8px;"></i>
+          Sales Overview
+        </div>
+        <span style="font-size: 0.8rem; color: var(--text-muted); background: var(--bg-dark-navy); padding: 4px 10px; border-radius: 6px;">
+          Live Database Telemetry
+        </span>
+      </div>
+
+      <!-- Canvas Chart Container -->
+      <div class="chart-canvas-wrapper">
+        <canvas id="salesOverviewChart"></canvas>
+      </div>
+    </div>
+
+    <!-- RECENT TRANSACTIONS TABLE -->
+    <div class="data-card">
+      <div class="card-header-bar">
+        <h3 style="font-size: 1.05rem; font-weight: 700;">Recent Sales Transactions</h3>
+        <a href="sales.html" class="btn btn-secondary" style="font-size: 0.82rem; padding: 6px 12px;">
+          View All Sales
+        </a>
+      </div>
+
+      <div class="table-responsive">
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th>Order ID</th>
+              <th>Customer Name</th>
+              <th>Date & Time</th>
+              <th>Total Amount</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="recent-sales-tbody">
+            <tr>
+              <td colspan="5" style="text-align: center; color: var(--text-muted);">Loading transactions...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/script.js"></script>
+  <script>
+    let salesChart = null;
+
+    async function loadDashboard() {
+      try {
+        const res = await API.getDashboardStats();
+        if (res.success && res.data) {
+          const d = res.data;
+          document.getElementById('kpi-products').textContent = (d.total_products || 0).toLocaleString();
+          document.getElementById('kpi-sales').textContent = formatCurrency(d.total_sales || 0);
+          document.getElementById('kpi-low-stock').textContent = (d.low_stock_count < 10 ? '0' : '') + (d.low_stock_count || 0);
+          document.getElementById('kpi-customers').textContent = (d.total_customers || 0).toLocaleString();
+
+          // Render recent sales
+          const tbody = document.getElementById('recent-sales-tbody');
+          if (d.recent_sales && d.recent_sales.length > 0) {
+            tbody.innerHTML = d.recent_sales.map(s => `
+              <tr>
+                <td><strong>#SALE-${s.sale_id}</strong></td>
+                <td>${s.customer_name}</td>
+                <td>${formatDate(s.sale_date)}</td>
+                <td style="color: var(--teal-primary); font-weight: 700;">${formatCurrency(s.total_amount)}</td>
+                <td>
+                  <a href="sales.html?view=${s.sale_id}" class="btn-icon" title="View Invoice">
+                    <i class="fa-solid fa-eye"></i>
+                  </a>
+                </td>
+              </tr>
+            `).join('');
+          } else {
+            tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted);">No sales recorded yet.</td></tr>`;
+          }
+
+          // Render Blueprint Style Wave Chart
+          renderChart(d.chart_data || []);
+        }
+      } catch (err) {
+        showToast('Failed to load dashboard data: ' + err.message, 'error');
+      }
+    }
+
+    function renderChart(dataPoints) {
+      const ctx = document.getElementById('salesOverviewChart').getContext('2d');
+      
+      let labels = dataPoints.map(p => p.date_label);
+      let values = dataPoints.map(p => p.daily_total);
+
+      if (labels.length === 0) {
+        labels = ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Day 6', 'Day 7'];
+        values = [1200, 1900, 1400, 2200, 2800, 3100, 4200];
+      }
+
+      if (salesChart) salesChart.destroy();
+
+      const gradient = ctx.createLinearGradient(0, 0, 0, 220);
+      gradient.addColorStop(0, 'rgba(20, 184, 166, 0.35)');
+      gradient.addColorStop(1, 'rgba(20, 184, 166, 0.0)');
+
+      salesChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Sales Revenue ($)',
+            data: values,
+            borderColor: '#14B8A6',
+            backgroundColor: gradient,
+            borderWidth: 3,
+            pointBackgroundColor: '#14B8A6',
+            pointBorderColor: '#101827',
+            pointRadius: 4,
+            pointHoverRadius: 6,
+            tension: 0.4,
+            fill: true
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            x: {
+              grid: { color: 'rgba(255, 255, 255, 0.05)' },
+              ticks: { color: '#94A3B8' }
+            },
+            y: {
+              grid: { color: 'rgba(255, 255, 255, 0.05)' },
+              ticks: { 
+                color: '#94A3B8',
+                callback: function(v) { return '$' + v; }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', loadDashboard);
+  </script>
+</body>
+</html>

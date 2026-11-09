@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DBMS AI Assistant - E-Commerce DBMS</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    .ai-hero-card {
+      background: linear-gradient(135deg, rgba(20, 184, 166, 0.1) 0%, rgba(2, 132, 199, 0.05) 100%);
+      border: 1px solid rgba(20, 184, 166, 0.3);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .full-ai-chat-box {
+      background-color: var(--bg-slate-navy);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      display: flex;
+      flex-direction: column;
+      height: calc(100vh - 280px);
+      min-height: 480px;
+    }
+    .full-chat-messages {
+      flex: 1;
+      padding: 24px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .full-chat-input-bar {
+      padding: 18px 24px;
+      background-color: rgba(16, 24, 39, 0.8);
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      gap: 12px;
+    }
+    .suggestion-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .suggestion-card {
+      background: var(--bg-dark-navy);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .suggestion-card:hover {
+      border-color: var(--teal-primary);
+      background: rgba(20, 184, 166, 0.1);
+      transform: translateY(-2px);
+    }
+    .suggestion-card i {
+      color: var(--teal-primary);
+      font-size: 1.2rem;
+    }
+    .suggestion-card-text {
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-brand-icon">
+        <i class="fa-solid fa-layer-group"></i>
+      </div>
+      <div>
+        <div class="sidebar-brand-title">E-Commerce</div>
+        <div class="sidebar-brand-sub">DBMS Portal</div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="index.html" class="nav-link">
+        <i class="fa-solid fa-chart-pie"></i>
+        <span>Dashboard</span>
+      </a>
+      <a href="products.html" class="nav-link">
+        <i class="fa-solid fa-box-open"></i>
+        <span>Products</span>
+      </a>
+      <a href="inventory.html" class="nav-link">
+        <i class="fa-solid fa-warehouse"></i>
+        <span>Inventory</span>
+      </a>
+      <a href="customers.html" class="nav-link">
+        <i class="fa-solid fa-users"></i>
+        <span>Customers</span>
+      </a>
+      <a href="suppliers.html" class="nav-link">
+        <i class="fa-solid fa-truck-moving"></i>
+        <span>Suppliers</span>
+      </a>
+      <a href="purchases.html" class="nav-link">
+        <i class="fa-solid fa-cart-shopping"></i>
+        <span>Purchases</span>
+      </a>
+      <a href="sales.html" class="nav-link">
+        <i class="fa-solid fa-cash-register"></i>
+        <span>Sales & POS</span>
+      </a>
+      <a href="reports.html" class="nav-link">
+        <i class="fa-solid fa-file-invoice-dollar"></i>
+        <span>Reports</span>
+      </a>
+      <a href="ai-assistant.html" class="nav-link active">
+        <i class="fa-solid fa-wand-magic-sparkles" style="color: var(--teal-primary);"></i>
+        <span>AI Assistant</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-profile">
+        <div class="user-avatar">A</div>
+        <div class="user-info">
+          <span class="user-name">Admin User</span>
+          <span class="user-role">Database Admin</span>
+        </div>
+      </div>
+      <a href="javascript:void(0)" onclick="logoutUser()" title="Logout" style="color: var(--text-muted); font-size: 1.1rem; cursor: pointer;">
+        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+      </a>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main-content">
+    <header class="top-header">
+      <div class="page-title">
+        <h1>AI Database Assistant & Viva Copilot</h1>
+        <p>Natural language queries against live relational tables, automated restocking intelligence, and DBMS viva explanation</p>
+      </div>
+    </header>
+
+    <div class="ai-hero-card">
+      <div>
+        <h3 style="font-size: 1.2rem; font-weight: 700; color: var(--text-main); margin-bottom: 6px;">
+          <i class="fa-solid fa-microchip" style="color: var(--teal-primary); margin-right: 8px;"></i>
+          Real-Time Relational Database Intelligence
+        </h3>
+        <p style="color: var(--text-muted); font-size: 0.9rem;">
+          Ask questions in plain English or Urdu. The AI translates questions into live relational queries and provides comprehensive business insights.
+        </p>
+        <div style="margin-top: 10px; font-size: 0.8rem; color: #14B8A6; display: flex; align-items: center; gap: 6px;">
+          <i class="fa-solid fa-circle-check"></i>
+          <span><strong>100% Free & Standalone:</strong> No API key is required. Works directly with your DBMS database!</span>
+        </div>
+      </div>
+      <div style="display: flex; gap: 10px; flex-direction: column; align-items: flex-end;">
+        <span class="badge badge-in-stock" style="font-size: 0.85rem; padding: 6px 14px;">
+          <i class="fa-solid fa-circle" style="font-size: 0.5rem; margin-right: 6px;"></i> Live DB Connected
+        </span>
+        <span style="font-size: 0.75rem; color: var(--text-muted);">
+          Optional: GEMINI_API_KEY in .env
+        </span>
+      </div>
+    </div>
+
+    <!-- QUICK SUGGESTIONS GRID -->
+    <div class="suggestion-grid">
+      <div class="suggestion-card" onclick="triggerQuery('Which products have low stock and need reordering?')">
+        <i class="fa-solid fa-triangle-exclamation" style="color: var(--amber-warning);"></i>
+        <div class="suggestion-card-text">Check Low Stock & Reorders</div>
+      </div>
+      <div class="suggestion-card" onclick="triggerQuery('What is our total sales revenue and top products?')">
+        <i class="fa-solid fa-sack-dollar"></i>
+        <div class="suggestion-card-text">Financial Sales Overview</div>
+      </div>
+      <div class="suggestion-card" onclick="triggerQuery('Explain 3NF Normalization for this project')">
+        <i class="fa-solid fa-graduation-cap"></i>
+        <div class="suggestion-card-text">Explain 3NF Normalization</div>
+      </div>
+      <div class="suggestion-card" onclick="triggerQuery('Explain the ER Diagram and database relationships')">
+        <i class="fa-solid fa-diagram-project"></i>
+        <div class="suggestion-card-text">ER Diagram & Foreign Keys</div>
+      </div>
+    </div>
+
+    <!-- CHAT INTERFACE CONTAINER -->
+    <div class="full-ai-chat-box">
+      <div class="full-chat-messages" id="full-chat-messages">
+        <div class="ai-msg assistant" style="max-width: 750px;">
+          <p><strong>👋 Welcome! How can I assist you with your E-Commerce DBMS today?</strong></p>
+          <p>You can click any of the prompt cards above or type your question below. I can inspect stock levels, analyze revenue, explain database normalization, or check supplier status.</p>
+        </div>
+      </div>
+
+      <form class="full-chat-input-bar" onsubmit="handleFullChatSubmit(event)">
+        <input type="text" id="full-chat-input" class="form-control" placeholder="Ask AI assistant anything about your DBMS project..." style="font-size: 0.95rem; padding: 12px 18px;" autocomplete="off">
+        <button type="submit" id="full-chat-send-btn" class="btn btn-primary" style="padding: 12px 24px; font-size: 1rem;">
+          <i class="fa-solid fa-paper-plane"></i> Send
+        </button>
+      </form>
+    </div>
+  </main>
+
+  <script src="js/api.js"></script>
+  <script src="js/script.js"></script>
+  <script>
+    function triggerQuery(text) {
+      document.getElementById('full-chat-input').value = text;
+      handleFullChatSubmit();
+    }
+
+    async function handleFullChatSubmit(e) {
+      if (e && e.preventDefault) e.preventDefault();
+      const input = document.getElementById('full-chat-input');
+      const messagesContainer = document.getElementById('full-chat-messages');
+      const sendBtn = document.getElementById('full-chat-send-btn');
+      const query = input.value.trim();
+
+      if (!query) return;
+
+      // Append user bubble
+      const userBubble = document.createElement('div');
+      userBubble.className = 'ai-msg user';
+      userBubble.textContent = query;
+      messagesContainer.appendChild(userBubble);
+
+      input.value = '';
+      sendBtn.disabled = true;
+      sendBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
+
+      // Append loading bubble
+      const loadingBubble = document.createElement('div');
+      loadingBubble.className = 'ai-msg assistant';
+      loadingBubble.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <em>Consulting database & generating response...</em>';
+      messagesContainer.appendChild(loadingBubble);
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+      try {
+        const res = await API.sendAiMessage(query);
+        loadingBubble.remove();
+
+        const aiBubble = document.createElement('div');
+        aiBubble.className = 'ai-msg assistant';
+        aiBubble.style.maxWidth = '750px';
+        aiBubble.innerHTML = formatAiMarkdown(res.reply || 'No response returned.');
+        messagesContainer.appendChild(aiBubble);
+      } catch (err) {
+        loadingBubble.remove();
+        const errBubble = document.createElement('div');
+        errBubble.className = 'ai-msg assistant';
+        errBubble.style.borderColor = 'var(--red-danger)';
+        errBubble.innerHTML = `<span style="color:var(--red-danger);">⚠️ Error: ${err.message}</span>`;
+        messagesContainer.appendChild(errBubble);
+      } finally {
+        sendBtn.disabled = false;
+        sendBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Send';
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+      }
+    }
+  </script>
+</body>
+</html>

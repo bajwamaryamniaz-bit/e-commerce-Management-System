@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inventory Management - E-Commerce DBMS</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-brand-icon">
+        <i class="fa-solid fa-layer-group"></i>
+      </div>
+      <div>
+        <div class="sidebar-brand-title">E-Commerce</div>
+        <div class="sidebar-brand-sub">DBMS Portal</div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="index.html" class="nav-link">
+        <i class="fa-solid fa-chart-pie"></i>
+        <span>Dashboard</span>
+      </a>
+      <a href="products.html" class="nav-link">
+        <i class="fa-solid fa-box-open"></i>
+        <span>Products</span>
+      </a>
+      <a href="inventory.html" class="nav-link active">
+        <i class="fa-solid fa-warehouse"></i>
+        <span>Inventory</span>
+      </a>
+      <a href="customers.html" class="nav-link">
+        <i class="fa-solid fa-users"></i>
+        <span>Customers</span>
+      </a>
+      <a href="suppliers.html" class="nav-link">
+        <i class="fa-solid fa-truck-moving"></i>
+        <span>Suppliers</span>
+      </a>
+      <a href="purchases.html" class="nav-link">
+        <i class="fa-solid fa-cart-shopping"></i>
+        <span>Purchases</span>
+      </a>
+      <a href="sales.html" class="nav-link">
+        <i class="fa-solid fa-cash-register"></i>
+        <span>Sales & POS</span>
+      </a>
+      <a href="reports.html" class="nav-link">
+        <i class="fa-solid fa-file-invoice-dollar"></i>
+        <span>Reports</span>
+      </a>
+      <a href="ai-assistant.html" class="nav-link">
+        <i class="fa-solid fa-wand-magic-sparkles" style="color: var(--teal-primary);"></i>
+        <span>AI Assistant</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-profile">
+        <div class="user-avatar">A</div>
+        <div class="user-info">
+          <span class="user-name">Admin User</span>
+          <span class="user-role">Database Admin</span>
+        </div>
+      </div>
+      <a href="javascript:void(0)" onclick="logoutUser()" title="Logout" style="color: var(--text-muted); font-size: 1.1rem; cursor: pointer;">
+        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+      </a>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main-content">
+    <header class="top-header">
+      <div class="page-title">
+        <h1>Inventory & Stock Levels</h1>
+        <p>Monitor warehouse stock, manage thresholds, and track automatic replenishment</p>
+      </div>
+      <div class="header-actions">
+        <a href="purchases.html" class="btn btn-primary">
+          <i class="fa-solid fa-truck-ramp-box"></i> Restock via Purchase
+        </a>
+      </div>
+    </header>
+
+    <div class="data-card">
+      <div class="card-header-bar">
+        <div style="display: flex; gap: 12px; align-items: center;">
+          <button class="btn btn-secondary active-filter" id="btn-all" onclick="setFilter('all')">
+            All Items
+          </button>
+          <button class="btn btn-secondary" id="btn-low" onclick="setFilter('low')">
+            <i class="fa-solid fa-triangle-exclamation" style="color: var(--amber-warning);"></i> Low Stock Only
+          </button>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>Category</th>
+              <th>Price</th>
+              <th>Available Stock</th>
+              <th>Threshold</th>
+              <th>Status</th>
+              <th>Last Updated</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="inventory-tbody">
+            <tr>
+              <td colspan="8" style="text-align: center; color: var(--text-muted);">Loading inventory records...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- STOCK ADJUST MODAL -->
+  <div class="modal-overlay" id="adjust-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Adjust Stock Level</h3>
+        <button class="modal-close" onclick="closeModal('adjust-modal')">&times;</button>
+      </div>
+      <form id="adjust-form" onsubmit="handleAdjustSubmit(event)">
+        <input type="hidden" id="adjust-product-id">
+        <div class="modal-body">
+          <p id="adjust-product-label" style="font-weight: 600; margin-bottom: 16px; color: var(--teal-primary);"></p>
+          <div class="form-group">
+            <label class="form-label">Quantity Available *</label>
+            <input type="number" min="0" id="adjust-quantity" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Low Stock Threshold</label>
+            <input type="number" min="1" id="adjust-threshold" class="form-control" value="10">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('adjust-modal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Update Stock</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/script.js"></script>
+  <script>
+    let inventoryData = [];
+    let currentFilter = 'all';
+
+    async function loadInventory() {
+      try {
+        const res = await API.getInventory();
+        if (res.success && res.data) {
+          inventoryData = res.data;
+          renderInventory();
+        }
+      } catch (err) {
+        showToast('Error loading inventory: ' + err.message, 'error');
+      }
+    }
+
+    function setFilter(filter) {
+      currentFilter = filter;
+      document.getElementById('btn-all').style.borderColor = filter === 'all' ? 'var(--teal-primary)' : 'var(--border-color)';
+      document.getElementById('btn-low').style.borderColor = filter === 'low' ? 'var(--amber-warning)' : 'var(--border-color)';
+      renderInventory();
+    }
+
+    function renderInventory() {
+      const tbody = document.getElementById('inventory-tbody');
+      let items = inventoryData;
+
+      if (currentFilter === 'low') {
+        items = items.filter(i => i.quantity_available <= i.low_stock_threshold);
+      }
+
+      if (items.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: var(--text-muted);">No records found.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = items.map(item => {
+        let badgeClass = 'badge-in-stock';
+        if (item.stock_status === 'Low Stock') badgeClass = 'badge-low-stock';
+        if (item.stock_status === 'Out of Stock') badgeClass = 'badge-out-of-stock';
+
+        return `
+          <tr>
+            <td><strong>${item.product_name}</strong></td>
+            <td>${item.category_name || 'General'}</td>
+            <td>${formatCurrency(item.price)}</td>
+            <td style="font-size: 1.05rem; font-weight: 700;">${item.quantity_available}</td>
+            <td style="color: var(--text-muted);">${item.low_stock_threshold}</td>
+            <td><span class="badge ${badgeClass}">${item.stock_status}</span></td>
+            <td style="font-size: 0.8rem; color: var(--text-muted);">${formatDate(item.last_updated)}</td>
+            <td>
+              <button class="btn btn-secondary" style="padding: 5px 10px; font-size: 0.78rem;" onclick="openAdjustModal(${item.product_id}, '${escapeQuotes(item.product_name)}', ${item.quantity_available}, ${item.low_stock_threshold})">
+                <i class="fa-solid fa-sliders"></i> Adjust
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function escapeQuotes(str) {
+      return (str || '').replace(/'/g, "\\'");
+    }
+
+    function openAdjustModal(productId, productName, qty, threshold) {
+      document.getElementById('adjust-product-id').value = productId;
+      document.getElementById('adjust-product-label').textContent = productName;
+      document.getElementById('adjust-quantity').value = qty;
+      document.getElementById('adjust-threshold').value = threshold || 10;
+      openModal('adjust-modal');
+    }
+
+    async function handleAdjustSubmit(e) {
+      e.preventDefault();
+      const id = document.getElementById('adjust-product-id').value;
+      const qty = document.getElementById('adjust-quantity').value;
+      const threshold = document.getElementById('adjust-threshold').value;
+
+      try {
+        await API.updateInventory(id, qty, threshold);
+        showToast('Inventory updated.');
+        closeModal('adjust-modal');
+        loadInventory();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadInventory);
+  </script>
+</body>
+</html>

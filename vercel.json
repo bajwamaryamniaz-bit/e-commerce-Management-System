@@ -1,12 +1,12 @@
 {
-  "functions": {
-    "api/index.py": {
-      "includeFiles": "{backend/**,frontend/**,api/frontend/**,setup_database.py}"
-    }
-  },
+  "cleanUrls": true,
   "rewrites": [
     {
-      "source": "/(.*)",
+      "source": "/",
+      "destination": "/login.html"
+    },
+    {
+      "source": "/api/(.*)",
       "destination": "/api/index"
     }
   ]

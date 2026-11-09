@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Products Management - E-Commerce DBMS</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <!-- SIDEBAR NAVIGATION -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-brand-icon">
+        <i class="fa-solid fa-layer-group"></i>
+      </div>
+      <div>
+        <div class="sidebar-brand-title">E-Commerce</div>
+        <div class="sidebar-brand-sub">DBMS Portal</div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="index.html" class="nav-link">
+        <i class="fa-solid fa-chart-pie"></i>
+        <span>Dashboard</span>
+      </a>
+      <a href="products.html" class="nav-link active">
+        <i class="fa-solid fa-box-open"></i>
+        <span>Products</span>
+      </a>
+      <a href="inventory.html" class="nav-link">
+        <i class="fa-solid fa-warehouse"></i>
+        <span>Inventory</span>
+      </a>
+      <a href="customers.html" class="nav-link">
+        <i class="fa-solid fa-users"></i>
+        <span>Customers</span>
+      </a>
+      <a href="suppliers.html" class="nav-link">
+        <i class="fa-solid fa-truck-moving"></i>
+        <span>Suppliers</span>
+      </a>
+      <a href="purchases.html" class="nav-link">
+        <i class="fa-solid fa-cart-shopping"></i>
+        <span>Purchases</span>
+      </a>
+      <a href="sales.html" class="nav-link">
+        <i class="fa-solid fa-cash-register"></i>
+        <span>Sales & POS</span>
+      </a>
+      <a href="reports.html" class="nav-link">
+        <i class="fa-solid fa-file-invoice-dollar"></i>
+        <span>Reports</span>
+      </a>
+      <a href="ai-assistant.html" class="nav-link">
+        <i class="fa-solid fa-wand-magic-sparkles" style="color: var(--teal-primary);"></i>
+        <span>AI Assistant</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-profile">
+        <div class="user-avatar">A</div>
+        <div class="user-info">
+          <span class="user-name">Admin User</span>
+          <span class="user-role">Database Admin</span>
+        </div>
+      </div>
+      <a href="javascript:void(0)" onclick="logoutUser()" title="Logout" style="color: var(--text-muted); font-size: 1.1rem; cursor: pointer;">
+        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+      </a>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-content">
+    <header class="top-header">
+      <div class="page-title">
+        <h1>Product Catalog</h1>
+        <p>Manage product items, categories, pricing and linked inventory records</p>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-secondary" onclick="openCategoryModal()">
+          <i class="fa-solid fa-tags"></i> Add Category
+        </button>
+        <button class="btn btn-primary" onclick="openProductModal()">
+          <i class="fa-solid fa-plus"></i> Add Product
+        </button>
+      </div>
+    </header>
+
+    <div class="data-card">
+      <div class="card-header-bar">
+        <div style="display: flex; gap: 12px; flex: 1; flex-wrap: wrap;">
+          <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+            <input type="text" id="search-input" placeholder="Search product name or specs..." onkeyup="filterProducts()">
+          </div>
+          <select id="category-filter" class="form-control" style="width: auto; min-width: 180px;" onchange="filterProducts()">
+            <option value="">All Categories</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Product Name</th>
+              <th>Category</th>
+              <th>Unit Price</th>
+              <th>Stock Level</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="products-table-body">
+            <tr>
+              <td colspan="7" style="text-align: center; color: var(--text-muted);">Loading products...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- PRODUCT MODAL (ADD / EDIT) -->
+  <div class="modal-overlay" id="product-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title" id="product-modal-title">Add New Product</h3>
+        <button class="modal-close" onclick="closeModal('product-modal')">&times;</button>
+      </div>
+      <form id="product-form" onsubmit="handleProductSubmit(event)">
+        <input type="hidden" id="product-id">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Product Name *</label>
+            <input type="text" id="product-name" class="form-control" required placeholder="e.g. Wireless Ergonomic Mouse">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Category</label>
+            <select id="product-category" class="form-control">
+              <option value="">Select Category</option>
+            </select>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+            <div class="form-group">
+              <label class="form-label">Price ($) *</label>
+              <input type="number" step="0.01" min="0" id="product-price" class="form-control" required placeholder="0.00">
+            </div>
+            <div class="form-group" id="initial-stock-group">
+              <label class="form-label">Initial Stock</label>
+              <input type="number" min="0" id="product-stock" class="form-control" value="0">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Description</label>
+            <textarea id="product-desc" class="form-control" placeholder="Product specifications and features..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('product-modal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Product</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- CATEGORY MODAL -->
+  <div class="modal-overlay" id="category-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Add Product Category</h3>
+        <button class="modal-close" onclick="closeModal('category-modal')">&times;</button>
+      </div>
+      <form id="category-form" onsubmit="handleCategorySubmit(event)">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Category Name *</label>
+            <input type="text" id="cat-name" class="form-control" required placeholder="e.g. Home Appliances">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Description</label>
+            <textarea id="cat-desc" class="form-control" placeholder="Category notes..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('category-modal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Add Category</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/script.js"></script>
+  <script>
+    let allProducts = [];
+
+    async function loadCategories() {
+      try {
+        const res = await API.getCategories();
+        if (res.success && res.data) {
+          const filter = document.getElementById('category-filter');
+          const select = document.getElementById('product-category');
+          filter.innerHTML = '<option value="">All Categories</option>';
+          select.innerHTML = '<option value="">Select Category</option>';
+
+          res.data.forEach(c => {
+            const opt1 = `<option value="${c.category_id}">${c.category_name}</option>`;
+            const opt2 = `<option value="${c.category_id}">${c.category_name}</option>`;
+            filter.innerHTML += opt1;
+            select.innerHTML += opt2;
+          });
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    async function loadProducts() {
+      try {
+        const search = document.getElementById('search-input').value;
+        const cat = document.getElementById('category-filter').value;
+        const res = await API.getProducts(search, cat);
+        if (res.success && res.data) {
+          allProducts = res.data;
+          renderProducts(allProducts);
+        }
+      } catch (err) {
+        showToast('Error loading products: ' + err.message, 'error');
+      }
+    }
+
+    function renderProducts(products) {
+      const tbody = document.getElementById('products-table-body');
+      if (products.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--text-muted);">No products found matching criteria.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = products.map(p => {
+        let badgeClass = 'badge-in-stock';
+        if (p.stock_status === 'Low Stock') badgeClass = 'badge-low-stock';
+        if (p.stock_status === 'Out of Stock') badgeClass = 'badge-out-of-stock';
+
+        return `
+          <tr>
+            <td><strong>#${p.product_id}</strong></td>
+            <td>
+              <div style="font-weight: 600;">${p.product_name}</div>
+              <div style="font-size: 0.78rem; color: var(--text-muted);">${p.description || 'No description'}</div>
+            </td>
+            <td>${p.category_name || '<em style="color:var(--text-muted)">Uncategorized</em>'}</td>
+            <td style="font-weight: 700; color: var(--teal-primary);">${formatCurrency(p.price)}</td>
+            <td><strong>${p.stock_quantity}</strong> units</td>
+            <td><span class="badge ${badgeClass}">${p.stock_status}</span></td>
+            <td>
+              <div class="action-buttons">
+                <button class="btn-icon" title="Edit Product" onclick="editProduct(${p.product_id})">
+                  <i class="fa-solid fa-pen-to-square"></i>
+                </button>
+                <button class="btn-icon delete" title="Delete Product" onclick="deleteProduct(${p.product_id})">
+                  <i class="fa-solid fa-trash-can"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function filterProducts() {
+      loadProducts();
+    }
+
+    function openProductModal() {
+      document.getElementById('product-form').reset();
+      document.getElementById('product-id').value = '';
+      document.getElementById('product-modal-title').textContent = 'Add New Product';
+      document.getElementById('initial-stock-group').style.display = 'block';
+      openModal('product-modal');
+    }
+
+    function openCategoryModal() {
+      document.getElementById('category-form').reset();
+      openModal('category-modal');
+    }
+
+    function editProduct(id) {
+      const p = allProducts.find(item => item.product_id === id);
+      if (!p) return;
+      document.getElementById('product-id').value = p.product_id;
+      document.getElementById('product-name').value = p.product_name;
+      document.getElementById('product-category').value = p.category_id || '';
+      document.getElementById('product-price').value = p.price;
+      document.getElementById('product-desc').value = p.description || '';
+      document.getElementById('initial-stock-group').style.display = 'none';
+      document.getElementById('product-modal-title').textContent = 'Edit Product';
+      openModal('product-modal');
+    }
+
+    async function handleProductSubmit(e) {
+      e.preventDefault();
+      const id = document.getElementById('product-id').value;
+      const data = {
+        product_name: document.getElementById('product-name').value,
+        category_id: document.getElementById('product-category').value || null,
+        price: parseFloat(document.getElementById('product-price').value),
+        description: document.getElementById('product-desc').value
+      };
+
+      try {
+        if (id) {
+          await API.updateProduct(id, data);
+          showToast('Product updated successfully.');
+        } else {
+          data.initial_stock = parseInt(document.getElementById('product-stock').value) || 0;
+          await API.addProduct(data);
+          showToast('Product added successfully.');
+        }
+        closeModal('product-modal');
+        loadProducts();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    async function handleCategorySubmit(e) {
+      e.preventDefault();
+      try {
+        await API.request('/products/categories', {
+          method: 'POST',
+          body: JSON.stringify({
+            category_name: document.getElementById('cat-name').value,
+            description: document.getElementById('cat-desc').value
+          })
+        });
+        showToast('Category added successfully.');
+        closeModal('category-modal');
+        loadCategories();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    async function deleteProduct(id) {
+      if (!confirm('Are you sure you want to delete this product?')) return;
+      try {
+        await API.deleteProduct(id);
+        showToast('Product deleted.');
+        loadProducts();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadCategories();
+      loadProducts();
+    });
+  </script>
+</body>
+</html>

@@ -47,6 +47,17 @@ def create_app():
     app.register_blueprint(reports_bp, url_prefix='/api/reports')
     app.register_blueprint(ai_bp, url_prefix='/api/ai')
 
+    # Also register alternative non-prefixed routes for serverless rewrites
+    app.register_blueprint(auth_bp, url_prefix='/auth', name='auth_alt')
+    app.register_blueprint(products_bp, url_prefix='/products_api', name='products_alt')
+    app.register_blueprint(customers_bp, url_prefix='/customers_api', name='customers_alt')
+    app.register_blueprint(suppliers_bp, url_prefix='/suppliers_api', name='suppliers_alt')
+    app.register_blueprint(purchases_bp, url_prefix='/purchases_api', name='purchases_alt')
+    app.register_blueprint(sales_bp, url_prefix='/sales_api', name='sales_alt')
+    app.register_blueprint(inventory_bp, url_prefix='/inventory_api', name='inventory_alt')
+    app.register_blueprint(reports_bp, url_prefix='/reports_api', name='reports_alt')
+    app.register_blueprint(ai_bp, url_prefix='/ai_api', name='ai_alt')
+
     # Frontend serving routes
     @app.route('/')
     def serve_dashboard():
