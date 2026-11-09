@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Purchases & Inbound Stock - E-Commerce DBMS</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-brand-icon">
+        <i class="fa-solid fa-layer-group"></i>
+      </div>
+      <div>
+        <div class="sidebar-brand-title">E-Commerce</div>
+        <div class="sidebar-brand-sub">DBMS Portal</div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="index.html" class="nav-link">
+        <i class="fa-solid fa-chart-pie"></i>
+        <span>Dashboard</span>
+      </a>
+      <a href="products.html" class="nav-link">
+        <i class="fa-solid fa-box-open"></i>
+        <span>Products</span>
+      </a>
+      <a href="inventory.html" class="nav-link">
+        <i class="fa-solid fa-warehouse"></i>
+        <span>Inventory</span>
+      </a>
+      <a href="customers.html" class="nav-link">
+        <i class="fa-solid fa-users"></i>
+        <span>Customers</span>
+      </a>
+      <a href="suppliers.html" class="nav-link">
+        <i class="fa-solid fa-truck-moving"></i>
+        <span>Suppliers</span>
+      </a>
+      <a href="purchases.html" class="nav-link active">
+        <i class="fa-solid fa-cart-shopping"></i>
+        <span>Purchases</span>
+      </a>
+      <a href="sales.html" class="nav-link">
+        <i class="fa-solid fa-cash-register"></i>
+        <span>Sales & POS</span>
+      </a>
+      <a href="reports.html" class="nav-link">
+        <i class="fa-solid fa-file-invoice-dollar"></i>
+        <span>Reports</span>
+      </a>
+      <a href="ai-assistant.html" class="nav-link">
+        <i class="fa-solid fa-wand-magic-sparkles" style="color: var(--teal-primary);"></i>
+        <span>AI Assistant</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-profile">
+        <div class="user-avatar">A</div>
+        <div class="user-info">
+          <span class="user-name">Admin User</span>
+          <span class="user-role">Database Admin</span>
+        </div>
+      </div>
+      <a href="javascript:void(0)" onclick="logoutUser()" title="Logout" style="color: var(--text-muted); font-size: 1.1rem; cursor: pointer;">
+        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+      </a>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <header class="top-header">
+      <div class="page-title">
+        <h1>Purchases & Restocking</h1>
+        <p>Record supplier purchase batches and automatically increment warehouse stock</p>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-primary" onclick="openNewPurchaseModal()">
+          <i class="fa-solid fa-plus"></i> New Purchase Order
+        </button>
+      </div>
+    </header>
+
+    <!-- PURCHASE ORDERS TABLE -->
+    <div class="data-card">
+      <div class="card-header-bar">
+        <h3 style="font-size: 1.05rem; font-weight: 700;">Purchase History</h3>
+      </div>
+
+      <div class="table-responsive">
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th>Purchase ID</th>
+              <th>Supplier Name</th>
+              <th>Date</th>
+              <th>Total Line Items</th>
+              <th>Total Amount</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="purchases-tbody">
+            <tr>
+              <td colspan="6" style="text-align: center; color: var(--text-muted);">Loading purchases...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- NEW PURCHASE MODAL -->
+  <div class="modal-overlay" id="purchase-modal">
+    <div class="modal-content" style="max-width: 720px;">
+      <div class="modal-header">
+        <h3 class="modal-title">Record New Purchase Order</h3>
+        <button class="modal-close" onclick="closeModal('purchase-modal')">&times;</button>
+      </div>
+      <form id="purchase-form" onsubmit="handlePurchaseSubmit(event)">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Select Supplier *</label>
+            <select id="purchase-supplier" class="form-control" required>
+              <option value="">-- Choose Supplier --</option>
+            </select>
+          </div>
+
+          <div style="margin: 20px 0 10px 0; display: flex; justify-content: space-between; align-items: center;">
+            <label class="form-label" style="margin: 0; font-size: 0.95rem;">Purchased Items *</label>
+            <button type="button" class="btn btn-secondary" style="padding: 4px 10px; font-size: 0.8rem;" onclick="addPurchaseRow()">
+              <i class="fa-solid fa-plus"></i> Add Item
+            </button>
+          </div>
+
+          <div id="purchase-items-container" style="display: flex; flex-direction: column; gap: 10px;">
+            <!-- Rows injected by JavaScript -->
+          </div>
+
+          <div style="margin-top: 20px; padding: 14px; background: var(--bg-dark-navy); border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-weight: 600;">Calculated Order Total:</span>
+            <span id="purchase-calculated-total" style="font-size: 1.3rem; font-weight: 800; color: var(--teal-primary);">$0.00</span>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('purchase-modal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Confirm & Restock</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- VIEW PURCHASE DETAILS MODAL -->
+  <div class="modal-overlay" id="view-purchase-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title" id="view-purchase-title">Purchase Details</h3>
+        <button class="modal-close" onclick="closeModal('view-purchase-modal')">&times;</button>
+      </div>
+      <div class="modal-body" id="view-purchase-body">
+        Loading...
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('view-purchase-modal')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/script.js"></script>
+  <script>
+    let productCatalog = [];
+    let suppliersCatalog = [];
+
+    async function initData() {
+      try {
+        const [pRes, sRes] = await Promise.all([
+          API.getProducts(),
+          API.getSuppliers()
+        ]);
+        if (pRes.success) productCatalog = pRes.data;
+        if (sRes.success) suppliersCatalog = sRes.data;
+
+        loadPurchases();
+      } catch (err) {
+        showToast('Error loading catalogs: ' + err.message, 'error');
+      }
+    }
+
+    async function loadPurchases() {
+      try {
+        const res = await API.getPurchases();
+        const tbody = document.getElementById('purchases-tbody');
+        if (res.success && res.data && res.data.length > 0) {
+          tbody.innerHTML = res.data.map(p => `
+            <tr>
+              <td><strong>#PO-${p.purchase_id}</strong></td>
+              <td style="font-weight: 600;">${p.supplier_name}</td>
+              <td>${formatDate(p.purchase_date)}</td>
+              <td>${p.total_items} items</td>
+              <td style="font-weight: 700; color: var(--teal-primary);">${formatCurrency(p.total_amount)}</td>
+              <td>
+                <button class="btn-icon" title="View Breakdown" onclick="viewPurchase(${p.purchase_id})">
+                  <i class="fa-solid fa-eye"></i>
+                </button>
+              </td>
+            </tr>
+          `).join('');
+        } else {
+          tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted);">No purchase records found.</td></tr>`;
+        }
+      } catch (err) {
+        showToast('Error loading purchases: ' + err.message, 'error');
+      }
+    }
+
+    function openNewPurchaseModal() {
+      const select = document.getElementById('purchase-supplier');
+      select.innerHTML = '<option value="">-- Choose Supplier --</option>' +
+        suppliersCatalog.map(s => `<option value="${s.supplier_id}">${s.supplier_name}</option>`).join('');
+
+      document.getElementById('purchase-items-container').innerHTML = '';
+      addPurchaseRow();
+      recalcTotal();
+      openModal('purchase-modal');
+    }
+
+    function addPurchaseRow() {
+      const container = document.getElementById('purchase-items-container');
+      const rowId = 'row-' + Date.now() + Math.random().toString(36).substr(2, 4);
+
+      const row = document.createElement('div');
+      row.className = 'purchase-item-row';
+      row.id = rowId;
+      row.style.cssText = 'display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 10px; align-items: center;';
+
+      const options = productCatalog.map(p => `<option value="${p.product_id}" data-price="${p.price}">${p.product_name}</option>`).join('');
+
+      row.innerHTML = `
+        <select class="form-control item-product" required onchange="onProductSelect('${rowId}')">
+          <option value="">-- Select Product --</option>
+          ${options}
+        </select>
+        <input type="number" min="1" value="10" class="form-control item-qty" placeholder="Qty" required oninput="recalcTotal()">
+        <input type="number" step="0.01" min="0" value="10.00" class="form-control item-cost" placeholder="Unit Cost ($)" required oninput="recalcTotal()">
+        <button type="button" class="btn-icon delete" title="Remove" onclick="document.getElementById('${rowId}').remove(); recalcTotal();">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      `;
+      container.appendChild(row);
+      recalcTotal();
+    }
+
+    function onProductSelect(rowId) {
+      const row = document.getElementById(rowId);
+      const sel = row.querySelector('.item-product');
+      const opt = sel.options[sel.selectedIndex];
+      if (opt && opt.dataset.price) {
+        // Wholesale cost estimate ~ 60% of retail price
+        const costInput = row.querySelector('.item-cost');
+        costInput.value = (parseFloat(opt.dataset.price) * 0.65).toFixed(2);
+      }
+      recalcTotal();
+    }
+
+    function recalcTotal() {
+      let sum = 0;
+      document.querySelectorAll('.purchase-item-row').forEach(row => {
+        const qty = parseFloat(row.querySelector('.item-qty').value) || 0;
+        const price = parseFloat(row.querySelector('.item-cost').value) || 0;
+        sum += (qty * price);
+      });
+      document.getElementById('purchase-calculated-total').textContent = formatCurrency(sum);
+    }
+
+    async function handlePurchaseSubmit(e) {
+      e.preventDefault();
+      const supplierId = document.getElementById('purchase-supplier').value;
+      const rows = document.querySelectorAll('.purchase-item-row');
+      const items = [];
+
+      rows.forEach(r => {
+        const prodId = r.querySelector('.item-product').value;
+        const qty = parseInt(r.querySelector('.item-qty').value);
+        const cost = parseFloat(r.querySelector('.item-cost').value);
+        if (prodId && qty > 0) {
+          items.push({
+            product_id: parseInt(prodId),
+            quantity: qty,
+            unit_price: cost
+          });
+        }
+      });
+
+      if (items.length === 0) {
+        showToast('Please add at least one product item.', 'warning');
+        return;
+      }
+
+      try {
+        await API.addPurchase(supplierId, items);
+        showToast('Purchase order saved! Inventory incremented.');
+        closeModal('purchase-modal');
+        loadPurchases();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    async function viewPurchase(id) {
+      try {
+        const res = await API.getPurchaseDetails(id);
+        if (res.success && res.data) {
+          const p = res.data;
+          document.getElementById('view-purchase-title').textContent = `Purchase Order #PO-${p.purchase_id}`;
+          
+          let itemsHtml = p.items.map(it => `
+            <tr>
+              <td>${it.product_name}</td>
+              <td>${it.quantity}</td>
+              <td>${formatCurrency(it.unit_price)}</td>
+              <td style="font-weight:700; color:var(--teal-primary);">${formatCurrency(it.subtotal)}</td>
+            </tr>
+          `).join('');
+
+          document.getElementById('view-purchase-body').innerHTML = `
+            <div style="margin-bottom: 16px;">
+              <p><strong>Supplier:</strong> ${p.supplier_name} (${p.phone || 'No phone'})</p>
+              <p><strong>Date:</strong> ${formatDate(p.purchase_date)}</p>
+              <p><strong>Total Amount:</strong> <span style="color:var(--teal-primary); font-weight:700;">${formatCurrency(p.total_amount)}</span></p>
+            </div>
+            <table class="custom-table">
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>Quantity</th>
+                  <th>Unit Cost</th>
+                  <th>Subtotal</th>
+                </tr>
+              </thead>
+              <tbody>${itemsHtml}</tbody>
+            </table>
+          `;
+          openModal('view-purchase-modal');
+        }
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', initData);
+  </script>
+</body>
+</html>
