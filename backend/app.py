@@ -4,8 +4,21 @@ from flask_cors import CORS
 from .config import Config
 
 def create_app():
-    # Path to frontend directory
-    frontend_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'frontend'))
+    # Robust resolution of frontend directory across local and cloud environments
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    candidates = [
+        os.path.abspath(os.path.join(base_dir, '..', 'frontend')),
+        os.path.abspath(os.path.join(base_dir, '..', 'api', 'frontend')),
+        os.path.abspath(os.path.join(os.getcwd(), 'frontend')),
+        os.path.abspath(os.path.join(base_dir, 'frontend')),
+        '/var/task/frontend',
+        '/var/task/api/frontend'
+    ]
+    frontend_dir = candidates[0]
+    for c in candidates:
+        if os.path.exists(c) and os.path.isdir(c):
+            frontend_dir = c
+            break
 
     app = Flask(__name__, static_folder=frontend_dir, static_url_path='')
     app.config.from_object(Config)
@@ -37,13 +50,23 @@ def create_app():
     # Frontend serving routes
     @app.route('/')
     def serve_dashboard():
-        return send_from_directory(frontend_dir, 'login.html')
+        if os.path.exists(os.path.join(frontend_dir, 'login.html')):
+            return send_from_directory(frontend_dir, 'login.html')
+        for cand in candidates:
+            if os.path.exists(os.path.join(cand, 'login.html')):
+                return send_from_directory(cand, 'login.html')
+        return "<h3>E-Commerce Management System API is running!</h3><p>Frontend assets are loading.</p>", 200
 
     @app.route('/<path:path>')
     def serve_static(path):
         if os.path.exists(os.path.join(frontend_dir, path)):
             return send_from_directory(frontend_dir, path)
-        return send_from_directory(frontend_dir, 'index.html')
+        for cand in candidates:
+            if os.path.exists(os.path.join(cand, path)):
+                return send_from_directory(cand, path)
+        if os.path.exists(os.path.join(frontend_dir, 'index.html')):
+            return send_from_directory(frontend_dir, 'index.html')
+        return jsonify({"success": False, "message": "Resource not found"}), 404
 
     @app.errorhandler(404)
     def not_found(e):
