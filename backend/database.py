@@ -45,7 +45,15 @@ def get_connection():
             logger.warning(f"Could not connect to PostgreSQL ({e}). Using local preview database.")
     
     # Fallback SQLite connection
-    conn = sqlite3.connect(Config.SQLITE_PATH)
+    db_file = Config.SQLITE_PATH
+    if not os.path.exists(db_file):
+        try:
+            from setup_database import setup_sqlite
+            setup_sqlite()
+        except Exception as e:
+            logger.warning(f"Could not auto-initialize sqlite database: {e}")
+
+    conn = sqlite3.connect(db_file)
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA foreign_keys = ON;")
     return conn, "sqlite"
